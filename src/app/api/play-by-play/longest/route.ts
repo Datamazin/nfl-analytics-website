@@ -66,7 +66,7 @@ export async function GET(request: Request) {
       // Aggregate by player
       const playerLongest = new Map<string, { yards: number, team: string, desc: string }>();
 
-      for (const play of plays) {
+      for (const play of plays as any[]) {
         const team = play.posteam;
         const yards = play.yards_gained;
         const player = type === 'pass' ? play.passer_player_name : play.rusher_player_name;
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
     // Team mode - aggregate by team to find longest play per team
     const teamLongest = new Map<string, { yards: number, player: string, desc: string }>();
 
-    for (const play of plays) {
+    for (const play of plays as any[]) {
       const team = play.posteam;
       const yards = play.yards_gained;
       const player = type === 'pass' ? play.passer_player_name : play.rusher_player_name;
@@ -127,7 +127,7 @@ export async function GET(request: Request) {
       .from('teams')
       .select('team_abbr, team_name, team_logo_espn, team_color');
 
-    const teamsMap = new Map(teams?.map(t => [t.team_abbr, t]) || []);
+    const teamsMap = new Map((teams as any[])?.map(t => [t.team_abbr, t]) || []);
 
     // Convert to leaderboard format
     const leaderboard = Array.from(teamLongest.entries()).map(([team, data]) => {

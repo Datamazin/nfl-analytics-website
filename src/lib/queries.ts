@@ -39,7 +39,7 @@ export async function getSeasons() {
   
   if (error) throw error;
   
-  const uniqueSeasons = [...new Set(data.map(d => d.season))];
+  const uniqueSeasons = [...new Set((data as any[]).map(d => d.season))];
   return uniqueSeasons;
 }
 
@@ -54,7 +54,7 @@ export async function getWeeksBySeason(season: number) {
   
   if (error) throw error;
   
-  const uniqueWeeks = [...new Set(data.map(d => d.week))].filter(w => w !== null) as number[];
+  const uniqueWeeks = [...new Set((data as any[]).map(d => d.week))].filter(w => w !== null) as number[];
   return uniqueWeeks;
 }
 
@@ -73,7 +73,7 @@ export async function getMostRecentCompletedWeek() {
     .maybeSingle();
   
   if (!completedError && completedData) {
-    return { season: completedData.season, week: completedData.week as number };
+    return { season: (completedData as any).season, week: (completedData as any).week as number };
   }
   
   // If no completed games, fall back to most recent scheduled week
@@ -89,7 +89,7 @@ export async function getMostRecentCompletedWeek() {
   if (scheduledError) throw scheduledError;
   if (!scheduledData) throw new Error('No schedule data found');
   
-  return { season: scheduledData.season, week: scheduledData.week as number };
+  return { season: (scheduledData as any).season, week: (scheduledData as any).week as number };
 }
 
 // Get team stats for a specific season and week
@@ -118,7 +118,7 @@ export async function getTeamStatsWithInfo(season: number, week: number) {
     getTeams()
   ]);
   
-  const teamsMap = new Map(teams.map(t => [t.team_abbr, t]));
+  const teamsMap = new Map((teams as any[]).map(t => [t.team_abbr, t]));
   
   return teamStats.map(stat => ({
     ...stat,
@@ -199,7 +199,7 @@ async function getTeamLeaderboardFromPlayerStats(
   
   // Get teams info
   const teams = await getTeams();
-  const teamsMap = new Map(teams.map(t => [t.team_abbr, t]));
+  const teamsMap = new Map((teams as any[]).map(t => [t.team_abbr, t]));
   
   // Aggregate by team
   const teamTotals = new Map<string, any>();
@@ -325,7 +325,7 @@ export async function getTeamLeaderboardAllWeeks(
   
   // Get teams info
   const teams = await getTeams();
-  const teamsMap = new Map(teams.map(t => [t.team_abbr, t]));
+  const teamsMap = new Map((teams as any[]).map(t => [t.team_abbr, t]));
   
   // Aggregate by team
   const teamTotals = new Map<string, any>();
