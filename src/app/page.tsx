@@ -156,7 +156,7 @@ export default function Home() {
                 .filter(([_, stats]) => stats.receiving_yards > 0)
                 .sort((a, b) => b[1].receiving_yards - a[1].receiving_yards)
                 .map(([team, stats]) => {
-                  const teamInfo = teamsMap.get(team);
+                  const teamInfo = teamsMap.get(team) as any;
                   return {
                     team,
                     team_name: teamInfo?.team_name || team,
@@ -170,7 +170,7 @@ export default function Home() {
                 .filter(([_, stats]) => stats.receptions > 0)
                 .sort((a, b) => b[1].receptions - a[1].receptions)
                 .map(([team, stats]) => {
-                  const teamInfo = teamsMap.get(team);
+                  const teamInfo = teamsMap.get(team) as any;
                   return {
                     team,
                     team_name: teamInfo?.team_name || team,
@@ -184,7 +184,7 @@ export default function Home() {
                 .filter(([_, stats]) => stats.receiving_tds > 0)
                 .sort((a, b) => b[1].receiving_tds - a[1].receiving_tds)
                 .map(([team, stats]) => {
-                  const teamInfo = teamsMap.get(team);
+                  const teamInfo = teamsMap.get(team) as any;
                   return {
                     team,
                     team_name: teamInfo?.team_name || team,
@@ -198,7 +198,7 @@ export default function Home() {
                 .filter(([_, stats]) => stats.targets > 0)
                 .sort((a, b) => b[1].targets - a[1].targets)
                 .map(([team, stats]) => {
-                  const teamInfo = teamsMap.get(team);
+                  const teamInfo = teamsMap.get(team) as any;
                   return {
                     team,
                     team_name: teamInfo?.team_name || team,
