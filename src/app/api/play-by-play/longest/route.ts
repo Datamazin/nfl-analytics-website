@@ -53,7 +53,7 @@ export async function GET(request: Request) {
     
     // Log play types to see what's in the data
     if (plays && plays.length > 0) {
-      const playTypes = new Set(plays.map(p => p.play_type).filter(Boolean));
+      const playTypes = new Set(plays.map((p: any) => p.play_type).filter(Boolean));
       console.log('Play types found:', Array.from(playTypes));
       console.log('Sample play:', plays[0]);
     }
