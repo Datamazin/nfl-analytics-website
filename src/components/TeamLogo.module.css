@@ -1,0 +1,18 @@
+.logoFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.75rem;
+  color: white;
+  border-radius: 0.25rem;
+  width: attr(data-size px, 32px);
+  height: attr(data-size px, 32px);
+  background-color: var(--team-color, #999);
+}
+
+/* Fallback for browsers that don't support attr() with type */
+.logoFallback[data-size] {
+  width: 32px;
+  height: 32px;
+}

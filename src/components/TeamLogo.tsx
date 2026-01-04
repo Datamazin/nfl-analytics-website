@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import styles from './TeamLogo.module.css';
 
 interface TeamLogoProps {
   src: string | null;
@@ -25,14 +26,9 @@ export default function TeamLogo({
   if (!src || imageError) {
     return (
       <div
-        className={`flex items-center justify-center font-bold text-xs ${className}`}
-        style={{
-          width: size,
-          height: size,
-          backgroundColor: teamColor || '#999',
-          color: '#fff',
-          borderRadius: '4px'
-        }}
+        className={`${styles.logoFallback} ${className}`}
+        data-size={size}
+        data-color={teamColor || '#999'}
       >
         {teamAbbr}
       </div>

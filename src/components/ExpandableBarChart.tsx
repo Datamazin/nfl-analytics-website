@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import TeamLogo from './TeamLogo';
 import type { TeamLeaderboard } from '@/types/database';
+import './ExpandableBarChart.css';
 
 interface ExpandableBarChartProps {
   data: TeamLeaderboard[];
@@ -95,24 +96,11 @@ export default function ExpandableBarChart({
       return (
         <g transform={`translate(${x},${y})`}>
           <foreignObject x={-40} y={-16} width={32} height={32}>
-            <div style={{ 
-              width: '32px', 
-              height: '32px', 
-              borderRadius: isPlayerHeadshot ? '50%' : '0',
-              overflow: 'hidden',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#f3f4f6'
-            }}>
+            <div className={`logo-container ${isPlayerHeadshot ? 'logo-container-rounded' : ''}`}>
               <img
                 src={team.team_logo_espn}
                 alt={team.team_name || team.team}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
+                className="logo-image"
                 onError={(e) => {
                   // Fallback to text if image fails
                   const target = e.target as HTMLImageElement;
