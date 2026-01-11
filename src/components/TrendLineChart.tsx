@@ -19,20 +19,36 @@ export default function TrendLineChart({
   lines,
   xAxisKey
 }: TrendLineChartProps) {
+  // Detect mobile viewport
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const chartHeight = isMobile ? 300 : 400;
+  
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-lg font-semibold mb-4">{title}</h3>
       
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={chartHeight}>
         <LineChart
           data={data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          margin={{
+            top: 5,
+            right: isMobile ? 10 : 30,
+            left: isMobile ? 0 : 20,
+            bottom: 5
+          }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={xAxisKey} />
-          <YAxis />
+          <XAxis 
+            dataKey={xAxisKey}
+            tick={{ fontSize: isMobile ? 10 : 12 }}
+          />
+          <YAxis 
+            tick={{ fontSize: isMobile ? 10 : 12 }}
+          />
           <Tooltip />
-          <Legend />
+          <Legend 
+            wrapperStyle={{ fontSize: isMobile ? '12px' : '14px' }}
+          />
           {lines.map((line) => (
             <Line
               key={line.dataKey}
@@ -40,9 +56,9 @@ export default function TrendLineChart({
               dataKey={line.dataKey}
               name={line.name}
               stroke={line.color}
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
+              strokeWidth={isMobile ? 1.5 : 2}
+              dot={{ r: isMobile ? 3 : 4 }}
+              activeDot={{ r: isMobile ? 5 : 6 }}
             />
           ))}
         </LineChart>

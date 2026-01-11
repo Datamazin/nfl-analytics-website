@@ -22,8 +22,11 @@ export default function ExpandableBarChart({
   const [expanded, setExpanded] = useState(false);
   const displayData = expanded ? data : data.slice(0, 10);
 
-  // Calculate dynamic height: 40px per bar for better spacing
-  const chartHeight = expanded ? Math.max(displayData.length * 40, 400) : 400;
+  // Calculate dynamic height: 40px per bar for better spacing on desktop, 35px on mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const barHeight = isMobile ? 35 : 40;
+  const minHeight = isMobile ? 300 : 400;
+  const chartHeight = expanded ? Math.max(displayData.length * barHeight, minHeight) : minHeight;
 
   console.log(`${title} - Data:`, displayData);
   console.log(`${title} - First item:`, displayData[0]);
@@ -36,11 +39,15 @@ export default function ExpandableBarChart({
     const { x, y, width, height, value } = props;
     const formattedValue = `${formatNumber(value)}${unit}`;
     
-    // Estimate label width (rough approximation: 7px per character)
-    const labelWidth = formattedValue.length * 7;
+    // Responsive font size
+    const fontSize = isMobile ? 10 : 12;
+    
+    // Estimate label width (rough approximation: 7px per character on desktop, 5.5px on mobile)
+    const charWidth = isMobile ? 5.5 : 7;
+    const labelWidth = formattedValue.length * charWidth;
     
     // If bar is too narrow (less than label width + padding), display outside
-    const isNarrow = width < labelWidth + 20;
+    const isNarrow = width < labelWidth + (isMobile ? 10 : 20);
     
     if (isNarrow) {
       return (
@@ -50,7 +57,7 @@ export default function ExpandableBarChart({
           fill="#374151"
           textAnchor="start"
           dominantBaseline="middle"
-          fontSize="12"
+          fontSize={fontSize}
           fontWeight="bold"
         >
           {formattedValue}
@@ -65,7 +72,7 @@ export default function ExpandableBarChart({
         fill="#fff"
         textAnchor="end"
         dominantBaseline="middle"
-        fontSize="12"
+        fontSize={fontSize}
         fontWeight="bold"
       >
         {formattedValue}
@@ -90,12 +97,16 @@ export default function ExpandableBarChart({
 
     if (!team) return null;
 
+    // Responsive logo size
+    const logoSize = isMobile ? 24 : 32;
+    const logoOffset = isMobile ? -32 : -40;
+
     // If logo exists (could be team logo or player headshot), display it
     if (team.team_logo_espn) {
       const isPlayerHeadshot = team.team_name?.includes('(');
       return (
         <g transform={`translate(${x},${y})`}>
-          <foreignObject x={-40} y={-16} width={32} height={32}>
+          <foreignObject x={logoOffset} y={-logoSize / 2} width={logoSize} height={logoSize}>
             <div className={`logo-container ${isPlayerHeadshot ? 'logo-container-rounded' : ''}`}>
               <img
                 src={team.team_logo_espn}
@@ -117,7 +128,7 @@ export default function ExpandableBarChart({
     if (team.team_name && team.team_name.includes('(')) {
       return (
         <g transform={`translate(${x},${y})`}>
-          <text x={-5} y={0} textAnchor="end" fontSize="12" fill="#374151" fontWeight="500">
+          <text x={-5} y={0} textAnchor="end" fontSize={isMobile ? 10 : 12} fill="#374151" fontWeight="500">
             {team.team_name}
           </text>
         </g>
@@ -126,13 +137,13 @@ export default function ExpandableBarChart({
 
     return (
       <g transform={`translate(${x},${y})`}>
-        <foreignObject x={-40} y={-16} width={32} height={32}>
+        <foreignObject x={logoOffset} y={-logoSize / 2} width={logoSize} height={logoSize}>
           <TeamLogo
             src={team.team_logo_espn}
             alt={team.team_name || team.team}
             teamAbbr={team.team}
             teamColor={team.team_color}
-            size={24}
+            size={isMobile ? 20 : 24}
           />
         </foreignObject>
       </g>
@@ -157,7 +168,12 @@ export default function ExpandableBarChart({
         <BarChart
           data={displayData}
           layout="vertical"
-          margin={{ top: 5, right: 30, left: data[0]?.team_logo_espn ? 50 : 150, bottom: 5 }}
+          margin={{
+            top: 5,
+            right: isMobile ? 10 : 30,
+            left: data[0]?.team_logo_espn ? (isMobile ? 40 : 50) : (isMobile ? 80 : 150),
+            bottom: 5
+          }}
           barCategoryGap="20%"
         >
           <CartesianGrid strokeDasharray="3 3" />
@@ -169,7 +185,7 @@ export default function ExpandableBarChart({
             dataKey="team" 
             type="category"
             tick={<CustomYAxisTick />}
-            width={data[0]?.team_logo_espn ? 50 : 150}
+            width={data[0]?.team_logo_espn ? (isMobile ? 40 : 50) : (isMobile ? 80 : 150)}
           />
           <Tooltip 
             formatter={(value: number | undefined) => value !== undefined ? [`${formatNumber(value)}${unit}`, dataKey] : ['-', dataKey]}
