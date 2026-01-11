@@ -28,10 +28,20 @@ export default function TrendLineChart({
       setIsMobile(window.innerWidth < 768);
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    // Debounce resize handler to improve performance
+    let timeoutId: NodeJS.Timeout;
+    const debouncedCheckMobile = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 150);
+    };
     
-    return () => window.removeEventListener('resize', checkMobile);
+    checkMobile();
+    window.addEventListener('resize', debouncedCheckMobile);
+    
+    return () => {
+      window.removeEventListener('resize', debouncedCheckMobile);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const chartHeight = isMobile ? 300 : 400;

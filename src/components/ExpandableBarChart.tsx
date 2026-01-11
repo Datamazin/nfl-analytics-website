@@ -29,10 +29,20 @@ export default function ExpandableBarChart({
       setIsMobile(window.innerWidth < 768);
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    // Debounce resize handler to improve performance
+    let timeoutId: NodeJS.Timeout;
+    const debouncedCheckMobile = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 150);
+    };
     
-    return () => window.removeEventListener('resize', checkMobile);
+    checkMobile();
+    window.addEventListener('resize', debouncedCheckMobile);
+    
+    return () => {
+      window.removeEventListener('resize', debouncedCheckMobile);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   // Calculate dynamic height: 40px per bar for better spacing on desktop, 35px on mobile
