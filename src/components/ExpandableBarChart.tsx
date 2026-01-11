@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import TeamLogo from './TeamLogo';
 import type { TeamLeaderboard } from '@/types/database';
@@ -20,10 +20,22 @@ export default function ExpandableBarChart({
   unit = ''
 }: ExpandableBarChartProps) {
   const [expanded, setExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const displayData = expanded ? data : data.slice(0, 10);
 
+  // Detect mobile viewport on mount and window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Calculate dynamic height: 40px per bar for better spacing on desktop, 35px on mobile
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const barHeight = isMobile ? 35 : 40;
   const minHeight = isMobile ? 300 : 400;
   const chartHeight = expanded ? Math.max(displayData.length * barHeight, minHeight) : minHeight;
@@ -80,18 +92,10 @@ export default function ExpandableBarChart({
     );
   };
 
-  if (!data || data.length === 0) {
-    return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-        <div className="text-center text-gray-500 py-8">
-          No data available for this week
-        </div>
-      </div>
-    );
-  }
-
-  const CustomYAxisTick = (props: any) => {
+  // Custom Y-Axis Tick component
+  // Note: We can't extract this outside because it needs access to data and isMobile
+  // But Recharts expects a component/function reference, not JSX
+  const renderCustomYAxisTick = (props: any) => {
     const { x, y, payload } = props;
     const team = data.find(d => d.team === payload.value);
 
@@ -150,6 +154,17 @@ export default function ExpandableBarChart({
     );
   };
 
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold mb-4">{title}</h3>
+        <div className="text-center text-gray-500 py-8">
+          No data available for this week
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
@@ -184,7 +199,7 @@ export default function ExpandableBarChart({
           <YAxis 
             dataKey="team" 
             type="category"
-            tick={<CustomYAxisTick />}
+            tick={renderCustomYAxisTick}
             width={data[0]?.team_logo_espn ? (isMobile ? 40 : 50) : (isMobile ? 80 : 150)}
           />
           <Tooltip 
