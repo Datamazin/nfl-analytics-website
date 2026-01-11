@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface TrendLineChartProps {
@@ -21,6 +21,7 @@ export default function TrendLineChart({
   xAxisKey
 }: TrendLineChartProps) {
   const [isMobile, setIsMobile] = useState(false);
+  const timeoutIdRef = useRef<NodeJS.Timeout>();
   
   // Detect mobile viewport on mount and window resize
   useEffect(() => {
@@ -29,10 +30,11 @@ export default function TrendLineChart({
     };
     
     // Debounce resize handler to improve performance
-    let timeoutId: NodeJS.Timeout;
     const debouncedCheckMobile = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(checkMobile, 150);
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
+      timeoutIdRef.current = setTimeout(checkMobile, 150);
     };
     
     checkMobile();
@@ -40,7 +42,9 @@ export default function TrendLineChart({
     
     return () => {
       window.removeEventListener('resize', debouncedCheckMobile);
-      clearTimeout(timeoutId);
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
     };
   }, []);
 

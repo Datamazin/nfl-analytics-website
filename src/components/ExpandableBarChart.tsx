@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import TeamLogo from './TeamLogo';
 import type { TeamLeaderboard } from '@/types/database';
@@ -21,6 +21,7 @@ export default function ExpandableBarChart({
 }: ExpandableBarChartProps) {
   const [expanded, setExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const timeoutIdRef = useRef<NodeJS.Timeout>();
   const displayData = expanded ? data : data.slice(0, 10);
 
   // Detect mobile viewport on mount and window resize
@@ -30,10 +31,11 @@ export default function ExpandableBarChart({
     };
     
     // Debounce resize handler to improve performance
-    let timeoutId: NodeJS.Timeout;
     const debouncedCheckMobile = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(checkMobile, 150);
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
+      timeoutIdRef.current = setTimeout(checkMobile, 150);
     };
     
     checkMobile();
@@ -41,7 +43,9 @@ export default function ExpandableBarChart({
     
     return () => {
       window.removeEventListener('resize', debouncedCheckMobile);
-      clearTimeout(timeoutId);
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
     };
   }, []);
 
